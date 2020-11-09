@@ -376,6 +376,34 @@ function draw1(){
         .attr('opacity', 1)
         .attr('x', margin.left)
         .attr('y', (d, i) => i * 5.2 + 30)
+
+
+
+        d3.forceSimulation()
+        .force("collide", d3.forceCollide(d => d.radius).iterations(2))
+        .force("charge", d3.forceManyBody())
+        // .velocityDecay(0.75)
+        // .alphaDecay(0.006)
+        .force("center", d3.forceCenter(1000 / 2, 950 / 2).strength(.5))
+        .force("y", d3.forceY(0))
+        .force("x", d3.forceX(0))
+        .nodes(dataset2)
+        .on('tick', ticked);
+
+        // Draw the circles
+        let node = svg.selectAll('circle')
+        .transition().duration(500).delay(100)
+
+            .data(dataset2)
+            .join('circle')
+            .attr('r',d => this.scaleSize(+(d['Number of speakers'].replace(/,/g, ''))))
+            .attr('fill',d => this.colorScale(d.Group))
+            .classed('circle', true)
+
+        // Run the update location function
+        function ticked() {
+            node.attr('cx', d => d.x );
+            node.attr('cy', d => d.y );
 }
 
 
