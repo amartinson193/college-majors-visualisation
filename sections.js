@@ -354,13 +354,14 @@ function drawInitial2(){
 
     //   let svg = d3.select("#vis").select('svg')
       simulation2 = d3.forceSimulation(dataset2)
-        //       .force("collide", d3.forceCollide(d => d.radius).iterations(2))
+              // .force("collide", d3.forceCollide(d => d.radius).iterations(20))
         // .force("charge", d3.forceManyBody())
         // .velocityDecay(0.75)
         // .alphaDecay(0.006)
         .force("center", d3.forceCenter(500,500))
         // .force("y", d3.forceY(0))
         // .force("x", d3.forceX(0))
+
 
 
       // Define each tick of simulation
@@ -455,14 +456,14 @@ function draw0(){
         .attr('r',d => my_scaleSize(d.NumberofSpeakers))
         .attr('fill',d => my_colorScale(d.Group))
 
-    // simulation2
-    //     .force("collide", d3.forceCollide(d => d.radius).iterations(20))
-    //     .force("charge", d3.forceManyBody())
-    //     .velocityDecay(0.75)
-    //     .alphaDecay(0.006)
-    //     .force("center", d3.forceCenter(2000,2000).strength(.5))
-    //     .force("y", d3.forceY(0))
-    //     .force("x", d3.forceX(0))
+    simulation2
+        // .force("collide", d3.forceCollide(d => d.radius).iterations(20))
+        // .force("charge", d3.forceManyBody())
+        // .velocityDecay(0.75)
+        // .alphaDecay(0.006)
+        // .force("center", d3.forceCenter(500,500))
+        // .force("y", d3.forceY(0))
+        // .force("x", d3.forceX(0))
 
     // simulation2.alpha(0.9).restart()
 
