@@ -341,6 +341,30 @@ d3.csv('data/National_Languages.csv', function(d){
   
 
 // }
+function colorScale(input){
+    // Get distinct values, taken from: https://codeburst.io/javascript-array-distinct-5edc93501dc4
+    const distinct = (value, index, self) => {
+        return self.indexOf(value) === index;
+    }
+        
+    let my_categories = dataset2.map(x => x.Group).filter(distinct);
+
+    // Color scale
+    let my_colorScale = d3.scaleOrdinal() 
+        .domain(my_categories)
+        .range(d3.schemeCategory10.slice(0,5))
+    
+    return my_colorScale(input)
+}
+
+function scaleSize(input){ 
+    
+    let my_scaleSize = d3.scaleSymlog() 
+        .domain([1, 232000000])
+        .range([1,20])
+        .nice()
+    return my_scaleSize(input)
+}
 
 function drawInitial2(){
 
@@ -376,72 +400,59 @@ function drawInitial2(){
      // Stop the simulation until later
     //  simulation2.stop()
 
-    // Get distinct values, taken from: https://codeburst.io/javascript-array-distinct-5edc93501dc4
-    const distinct = (value, index, self) => {
-        return self.indexOf(value) === index;
-    }
-        
-    let my_categories = dataset2.map(x => x.Group).filter(distinct);
-
-    // Color scale
-    let my_colorScale = d3.scaleOrdinal() 
-        .domain(my_categories)
-        .range(d3.schemeCategory10.slice(0,5))
-
-    let my_scaleSize = d3.scaleSymlog() 
-        .domain([1, 232000000])
-        .range([1,20])
-        .nice()
     
     // svg.selectAll('circle').remove()
 
     nodes2 = svg
         .selectAll('circle')
-        .classed('my_circles', true)
         .data(dataset2)
         .join('circle')
-        .attr('r',d => my_scaleSize(d.NumberofSpeakers))
-        .attr('fill',d => my_colorScale(d.Group))
+        .classed('my_circles', true)
+        .attr('r',d => scaleSize(d.NumberofSpeakers))
+        .attr('fill',d => colorScale(d.Group))
         .attr('opacity', 0.8)
+    
 }
 
 
 //Cleaning Function
 //Will hide all the elements which are not necessary for a given chart type 
 
-// function clean(chartType){
-//     let svg = d3.select('#vis').select('svg')
-//     if (chartType !== "isScatter") {
-//         svg.select('.scatter-x').transition().attr('opacity', 0)
-//         svg.select('.scatter-y').transition().attr('opacity', 0)
-//         svg.select('.best-fit').transition().duration(200).attr('opacity', 0)
-//     }
-//     if (chartType !== "isMultiples"){
-//         svg.selectAll('.lab-text').transition().attr('opacity', 0)
-//             .attr('x', 1800)
-//         svg.selectAll('.cat-rect').transition().attr('opacity', 0)
-//             .attr('x', 1800)
-//     }
-//     if (chartType !== "isFirst"){
-//         svg.select('.first-axis').transition().attr('opacity', 0)
-//         svg.selectAll('.small-text').transition().attr('opacity', 0)
-//             .attr('x', -200)
-//     }
-//     if (chartType !== "isHist"){
-//         svg.selectAll('.hist-axis').transition().attr('opacity', 0)
-//     }
-//     if (chartType !== "isBubble"){
-//         svg.select('.enrolment-axis').transition().attr('opacity', 0)
-//     }
-// }
+function clean(chartType){
+    let svg = d3.select('#vis').select('svg')
+    if (chartType !== "isScatter") {
+        svg.select('.scatter-x').transition().attr('opacity', 0)
+        svg.select('.scatter-y').transition().attr('opacity', 0)
+        svg.select('.best-fit').transition().duration(200).attr('opacity', 0)
+    }
+    if (chartType !== "isMultiples"){
+        svg.selectAll('.lab-text').transition().attr('opacity', 0)
+            .attr('x', 1800)
+        svg.selectAll('.cat-rect').transition().attr('opacity', 0)
+            .attr('x', 1800)
+    }
+    if (chartType !== "isFirst"){
+        svg.select('.first-axis').transition().attr('opacity', 0)
+        svg.selectAll('.small-text').transition().attr('opacity', 0)
+            .attr('x', -200)
+        svg.selectAll('.my_circles').transition().attr('opacity',0)
+    }
+    if (chartType !== "isHist"){
+        svg.selectAll('.hist-axis').transition().attr('opacity', 0)
+    }
+    if (chartType !== "isBubble"){
+        svg.select('.enrolment-axis').transition().attr('opacity', 0)
+    }
+}
 
 //First draw function
 function draw0(){
     //Stop simulation
     // simulation.stop()
-    // simulation2.stop()
+    simulation2.stop()
+    
 
-    // clean('isFirst')
+    clean('isFirst') // Turns off opacity for all other charts
 
     d3.select('.categoryLegend').transition().remove()
 
@@ -451,25 +462,36 @@ function draw0(){
         // .attr('height', 950)
         // .attr('position','relative')
     
-    svg.selectAll('my_circles')
-        .transition().duration(500).delay(100)
-        .attr('r',d => my_scaleSize(d.NumberofSpeakers))
-        .attr('fill',d => my_colorScale(d.Group))
+    svg.selectAll('.my_circles')
+        .transition()
+        .attr('opacity',0)
+        .attr('r',d => scaleSize(d.NumberofSpeakers))
+        .attr('fill',d => colorScale(d.Group))
+        .attr('opacity',.8)
+        
 
     simulation2
         // .force("collide", d3.forceCollide(d => d.radius).iterations(20))
         // .force("charge", d3.forceManyBody())
         // .velocityDecay(0.75)
         // .alphaDecay(0.006)
-        // .force("center", d3.forceCenter(500,500))
+        .force("center", d3.forceCenter(1000,1000))
         // .force("y", d3.forceY(0))
         // .force("x", d3.forceX(0))
 
     // simulation2.alpha(0.9).restart()
+    
+    
 
 
 }
 
+function draw1(){
+
+clean('isMultiples')
+console.log('This is the SVG', svg)
+
+}
 // function draw1(){
 //     //Stop simulation
 //     simulation.stop()
@@ -696,8 +718,8 @@ function draw0(){
 //Will be called from the scroller functionality
 
 let activationFunctions = [
-    draw0
-    // draw1,
+    draw0,
+    draw1
     // draw2,
     // draw3,
     // draw4,
@@ -718,7 +740,7 @@ scroll()
 let lastIndex, activeIndex = 0
 
 scroll.on('active', function(index){
-    d3.selectAll('.step')
+    d3.selectAll('.step') // Control opacity of the titles
         .transition().duration(500)
         .style('opacity', function (d, i) {return i === index ? 1 : 0.1;});
     
